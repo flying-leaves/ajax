@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>有一天，央视解说员齐聚一堂</title>
+	<style>
+		ul{list-style: none;padding:0;margin:0;}/*reset*/
+		#datalist{border:1px solid #ddd;padding:15px;}
+		#datalist li{padding:5px;border-bottom:1px dotted #ccc;}
+		/*#datalist ul{display: none;}*/
+		#page span{display:inline-block;margin:5px;width:40px;line-height:1.8;text-align: center;background-color:#dfdfdf;color:#666;}
+		#page span.active{background-color:#fc0;color:#fff;}
+	</style>
+	<script src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+	<h1>有一天，央视解说员齐聚一堂</h1>
+	<div id="data">
+		<div id="datalist">
+		</div>
+		<img src="images/loading.gif" style="display: none;margin: 100px 500px; " id="loading">
+	</div>
+	<button>点击加载</button>
+</body>
+<script>
+$(function () {
+	
+	// 获取datalist，loading元素
+	var $dataList = $('#datalist');
+	var $loading = $('#loading');
+	
+	var index = 1; // 初始化索引
+	
+	// 初始化，显示第一页的数据
+	ajax ();
+	
+	// 绑定点击加载按钮事件
+	$('button').on('click', function () {
+		index++;
+		
+		$loading.show();
+		
+		// 模式带宽慢，设置定时器
+		setTimeout(ajax, 3000);
+		
+		// 最后一个按钮隐藏
+		if(index == 5 ){
+			$(this).hide();
+		}
+		
+	})
+	
+	// 封装ajax调用
+	function ajax () {
+		$.ajax({
+			'url': 'json/football' + index + '.json',
+			'dataType': 'json',
+			'success': function (data) {
+				var d = data.data;
+				
+				var _html = '';
+				_html += '<ul>';
+				
+				// 循环数据得到每个对象
+				$.each(d, function (idx, ele) {
+					_html += '<li>';
+					_html += '<strong>' + ele.name + '</strong> ' + ele.content;
+					_html += '</li>';
+				})
+				_html += '</ul>';
+				
+				// 隐藏loading，显示列表
+				$loading.hide();
+				$dataList.append(_html);
+			}
+		})
+	}
+})
+</script>
+</html>

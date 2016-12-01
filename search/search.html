@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>搜索过滤效果</title>
+	<style>
+		.namelist{
+			display:none;
+			height:400px;
+			width:200px;
+			padding:5px 10px;border:1px solid #ddd;overflow-y:auto;
+		}
+		.namelist li{margin: 10px 0;}
+	</style>
+	<script src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+	<h1>搜索过滤</h1>
+	<input type="text" id="keyword"><button>提交</button>
+	<ul class="namelist"></ul>
+</body>
+<script>
+$(function (){
+
+	/*
+	 * 循环数组形成列表
+	 * 获得焦点的时候显示，失去焦点隐藏
+	 * 根据输入内容匹配结果
+	 */
+	var $keyWord = $('#keyword'), $nameList = $('.namelist');
+	var $button = $('button');
+
+	// 输入框获取焦点
+	$keyWord.focus(function () {
+//		$.ajax({	//会重复加载
+//			'url': 'json/search.json',
+//			'dataType': 'json',
+//			"success": function (data){
+//				var d = data.data;
+//				$.each(d, function (idx, ele) {
+//					$('<li/>').html(ele).appendTo($nameList);
+//				});
+//				$nameList.show();
+//			}
+//		})
+		$nameList.show();
+
+		if($nameList.html() == ''){
+			$.ajax({
+				'url': 'json/search.json',
+				'dataType': 'json',
+				"success": function (data){
+					var d = data.data;
+					$.each(d, function (idx, ele) {
+						$('<li/>').html(ele).appendTo($nameList);
+					});
+				}
+			})
+		}
+	}).blur (function () {
+		setTimeout(function() {
+			$nameList.hide();
+		}, 500)
+	}).keyup(function () {
+		var $keyVal = $keyWord.val();
+		// 匹配下拉框的数据
+		$nameList.children('li').hide().filter('li:contains(' + $keyVal + ')').show();
+	})
+	// 点击列表往输入框赋值
+	$nameList.on('click', 'li', function () {
+		$keyWord.val($(this).html());
+	})
+	$button.on('click', function () {
+		var val =  $keyWord.val();
+		if(val == ''){
+			alert('搜索关键词不能为空，请重新输入！');
+			return;
+		}
+		location.href = 'search-result.html?keyword='+escape(val);//escape(val) 编码
+	})
+	
+})
+</script>
+</html>
